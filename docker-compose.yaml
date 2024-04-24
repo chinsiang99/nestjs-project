@@ -1,0 +1,70 @@
+services:
+  api:
+    container_name: api_backend
+    depends_on:
+      - db
+    build:
+      dockerfile: Dockerfile.dev
+      # context means that the current directory
+      context: .
+      # Only will build development stage from our dockerfile
+      target: development
+    volumes:
+    # - .:/usr/src/app
+    #This specific volume definition is using a bind mount. It establishes a direct mapping between the current directory on the host machine (.) and the /usr/src/app directory inside the container.
+      - .:/usr/src/app
+    env_file:
+      - .env
+    networks:
+      - nesjs-network
+    # Run a command against the development stage of the image
+    command: npm run start:dev
+    ports:
+      - 3000:3000
+  db:
+    container_name: dbConnection
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB}
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: ${MYSQL_USER}
+      # You can use whatever password you like
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD_ROOT}
+    networks:
+      - nesjs-network
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - '3310:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+  adminer:
+    container_name: adminer-mysql-web-GUI
+    image: adminer:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - nesjs-network
+  phpmyadmin:
+    container_name: phpmyadmin-mysql-web-GUI
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "7777:80"
+    networks:
+      - nesjs-network
+volumes:
+  my-db:
+networks:
+    nesjs-network:
+      driver: bridge

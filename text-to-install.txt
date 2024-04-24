@@ -1,0 +1,11 @@
+npm i @nestjs/typeorm typeorm mysql2
+
+npm i @nestjs/config
+
+npm i class-validator class-transformer
+
+npm i @nestjs/swagger
+
+npm i winston
+
+npm i winston-daily-rotate-file
