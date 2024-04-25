@@ -9,3 +9,22 @@ npm i @nestjs/swagger
 npm i winston
 
 npm i winston-daily-rotate-file
+
+for gitcommit lint, we need to first install using command below:
+1. npm i --save-dev commitlint
+2. npm i --save-dev husky
+3. npx husky init
+4. create two files in .husky folder
+    - commit-msg
+    - pre-commit
+5. commit-msg file with content:
+. "$(dirname -- "$0")/_/husky.sh"
+
+npx commitlint --edit
+6. pre-commit file with content:
+npx lint-staged
+7. npm i --save-dev lint-staged and add below to package.json:
+  "lint-staged": {
+    "*.ts": "eslint --cache --fix"
+  }
+8. npm i eslint-plugin-unused-imports --save-dev --force
