@@ -20,5 +20,8 @@
   },
   "watchOptions": {
     "watchFile": "fixedPollingInterval" // this watch option is very important, so that the --watch is working expectedly, see "https://docs.nestjs.com/faq/common-errors#file-change-detected-loops-endlessly"
-  }
+  },
+  "include": [
+    "src/**/*",
+  ],
 }
