@@ -15,6 +15,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IJwtToken } from '../utils/interfaces/jwt-token.interface';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -87,6 +88,28 @@ export class AuthService {
       throw new InternalServerErrorException(
         'There is a problem while generating the token',
       );
+    }
+  }
+
+  /**
+   * Retrieves a new pair of JWT tokens using the provided refresh token.
+   *
+   * @param {RefreshTokenDto} refreshtokenDto - The data containing the refresh token.
+   * @returns {Promise<IJwtToken>} A promise that resolves with the new JWT tokens upon successful verification of the refresh token.
+   * @throws {UnauthorizedException} Thrown if the refresh token is invalid or expired.
+   */
+  async getRefreshTokenDto(
+    refreshtokenDto: RefreshTokenDto,
+  ): Promise<IJwtToken> {
+    const { refreshToken } = refreshtokenDto;
+    try {
+      const { id } = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+      });
+      const user = await this.userRepository.findOne({ where: { id } });
+      return await this.generateToken(user);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid credentials');
     }
   }
 

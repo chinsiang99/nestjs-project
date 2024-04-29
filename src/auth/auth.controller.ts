@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpCode,
+  Get,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/create-auth.dto';
 import {
@@ -17,6 +24,7 @@ import {
   ILoginResponse,
   LoginResponse,
 } from 'src/utils/response-interface/login-response.interface';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -36,6 +44,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'User log in an account' })
   @ApiOkResponse({
     type: LoginResponse,
@@ -45,8 +54,27 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto): Promise<ILoginResponse> {
     const token = await this.authService.login(loginDto);
     return {
-      status: HttpStatus.CREATED,
+      status: HttpStatus.OK,
       message: 'Successfully log in',
+      data: token,
+    };
+  }
+
+  @Get('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get refresh token' })
+  @ApiOkResponse({
+    type: LoginResponse,
+    description: 'Successfully get refresh token',
+  })
+  @ApiBadRequestResponse({ description: 'Bad request error' })
+  async getRefreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<ILoginResponse> {
+    const token = await this.authService.getRefreshTokenDto(refreshTokenDto);
+    return {
+      status: HttpStatus.OK,
+      message: 'Successfully refresh token',
       data: token,
     };
   }
