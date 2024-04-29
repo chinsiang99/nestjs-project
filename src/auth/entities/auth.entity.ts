@@ -1,3 +1,4 @@
+import { UserRoleEnum } from '../../utils/enums/user-role.enum';
 import { AuthStrategyEnum } from '../../utils/enums/auth-strategy.enum';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -25,4 +26,12 @@ export class User {
     name: 'auth_strategy',
   })
   authStrategy: AuthStrategyEnum = AuthStrategyEnum.SYSTEM;
+
+  @Column({
+    type: 'enum',
+    enum: UserRoleEnum,
+    default: UserRoleEnum.USER,
+    name: 'role',
+  })
+  role: UserRoleEnum = UserRoleEnum.USER;
 }
