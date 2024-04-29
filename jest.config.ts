@@ -42,7 +42,8 @@ export default {
         "utilities",
         "interface",
         "app.controller.ts",
-        "http-exception"
+        "http-exception",
+        ".strategy.ts"
     ],
     "moduleDirectories": [
         "node_modules", "src"

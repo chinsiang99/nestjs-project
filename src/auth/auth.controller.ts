@@ -5,6 +5,7 @@ import {
   HttpStatus,
   HttpCode,
   Get,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/create-auth.dto';
@@ -25,6 +26,7 @@ import {
   LoginResponse,
 } from 'src/utils/response-interface/login-response.interface';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { AccessTokenGuard } from 'src/utils/guards/access-token.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -60,6 +62,7 @@ export class AuthController {
     };
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get('refresh-token')
   @ApiOperation({ summary: 'Get refresh token' })
   @ApiOkResponse({
