@@ -2,6 +2,7 @@ import {
   BadRequestException,
   HttpException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -57,8 +58,9 @@ export class AuthService {
    *
    * @param {LoginDto} loginDto - The data containing the email and password for logging in.
    * @returns {Promise<IJwtToken>} A promise that resolves with the JWT tokens upon successful login.
-   * @throws {NotFoundException} Throws a NotFoundException if the user with the provided email does not exist.
-   * @throws {UnauthorizedException} Throws an UnauthorizedException if the provided password is invalid.
+   * @throws {NotFoundException} Thrown if the user with the provided email does not exist.
+   * @throws {UnauthorizedException} Thrown if the provided password is invalid.
+   * @throws {InternalServerErrorException} Thrown if there is a problem while generating the token.
    */
   async login(loginDto: LoginDto): Promise<IJwtToken> {
     const { email, password } = loginDto;
@@ -79,7 +81,13 @@ export class AuthService {
       throw new UnauthorizedException(`Invalid credentials`);
     }
 
-    return await this.generateToken(existingUser);
+    try {
+      return await this.generateToken(existingUser);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'There is a problem while generating the token',
+      );
+    }
   }
 
   /**
