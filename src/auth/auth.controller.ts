@@ -61,7 +61,6 @@ export class AuthController {
   }
 
   @Get('refresh-token')
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get refresh token' })
   @ApiOkResponse({
     type: LoginResponse,
@@ -71,7 +70,7 @@ export class AuthController {
   async getRefreshToken(
     @Body() refreshTokenDto: RefreshTokenDto,
   ): Promise<ILoginResponse> {
-    const token = await this.authService.getRefreshTokenDto(refreshTokenDto);
+    const token = await this.authService.getRefreshToken(refreshTokenDto);
     return {
       status: HttpStatus.OK,
       message: 'Successfully refresh token',

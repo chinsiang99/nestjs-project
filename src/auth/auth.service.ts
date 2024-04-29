@@ -98,9 +98,7 @@ export class AuthService {
    * @returns {Promise<IJwtToken>} A promise that resolves with the new JWT tokens upon successful verification of the refresh token.
    * @throws {UnauthorizedException} Thrown if the refresh token is invalid or expired.
    */
-  async getRefreshTokenDto(
-    refreshtokenDto: RefreshTokenDto,
-  ): Promise<IJwtToken> {
+  async getRefreshToken(refreshtokenDto: RefreshTokenDto): Promise<IJwtToken> {
     const { refreshToken } = refreshtokenDto;
     try {
       const { id } = await this.jwtService.verifyAsync(refreshToken, {
@@ -119,7 +117,7 @@ export class AuthService {
    * @param {string} password - The password to hash.
    * @returns {string} The hashed password.
    */
-  private hashPassword(password: string): string {
+  hashPassword(password: string): string {
     return hashSync(password, 10);
   }
 
@@ -129,7 +127,7 @@ export class AuthService {
    * @param {User} user - The user object for which to generate tokens.
    * @returns {Promise<IJwtToken>} A promise that resolves with the generated JWT tokens.
    */
-  private async generateToken(user: User): Promise<IJwtToken> {
+  async generateToken(user: User): Promise<IJwtToken> {
     const { id, email, role, authStrategy } = user;
 
     // Sign access token and refresh token separately
