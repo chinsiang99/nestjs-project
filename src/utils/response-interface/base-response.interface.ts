@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Interface representing a base response.
@@ -8,6 +8,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export interface IBaseResponse {
   status: number;
   message: string;
+  data?: object;
 }
 
 /**
@@ -21,4 +22,7 @@ export class BaseResponse implements IBaseResponse {
 
   @ApiProperty({ description: 'message of the response' })
   message: string;
+
+  @ApiPropertyOptional({ description: 'data of the response' })
+  data: object;
 }

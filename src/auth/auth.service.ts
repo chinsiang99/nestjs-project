@@ -1,14 +1,26 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RegisterDto } from './dto/create-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/auth.entity';
 import { Repository } from 'typeorm';
-import { hashSync } from 'bcryptjs';
+import { compareSync, hashSync } from 'bcryptjs';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { IJwtToken } from '../utils/interfaces/jwt-token.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>, //
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -41,6 +53,36 @@ export class AuthService {
   }
 
   /**
+   * Logs in a user using the provided login credentials.
+   *
+   * @param {LoginDto} loginDto - The data containing the email and password for logging in.
+   * @returns {Promise<IJwtToken>} A promise that resolves with the JWT tokens upon successful login.
+   * @throws {NotFoundException} Throws a NotFoundException if the user with the provided email does not exist.
+   * @throws {UnauthorizedException} Throws an UnauthorizedException if the provided password is invalid.
+   */
+  async login(loginDto: LoginDto): Promise<IJwtToken> {
+    const { email, password } = loginDto;
+
+    const existingUser = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+
+    const isValidpassword = compareSync(password, existingUser.password);
+
+    if (!isValidpassword) {
+      throw new UnauthorizedException(`Invalid credentials`);
+    }
+
+    return await this.generateToken(existingUser);
+  }
+
+  /**
    * Hashes a password using bcrypt.
    *
    * @param {string} password - The password to hash.
@@ -48,5 +90,44 @@ export class AuthService {
    */
   private hashPassword(password: string): string {
     return hashSync(password, 10);
+  }
+
+  /**
+   * Generates JWT tokens for the provided user.
+   *
+   * @param {User} user - The user object for which to generate tokens.
+   * @returns {Promise<IJwtToken>} A promise that resolves with the generated JWT tokens.
+   */
+  private async generateToken(user: User): Promise<IJwtToken> {
+    const { id, email, role, authStrategy } = user;
+
+    // Sign access token and refresh token separately
+    const accessTokenPromise = this.jwtService.signAsync(
+      { sub: id, email, role, authStrategy },
+      {
+        secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+        expiresIn: this.configService.get<string>(
+          'JWT_ACCESS_TOKEN_EXPIRATION',
+        ),
+      },
+    );
+
+    const refreshTokenPromise = this.jwtService.signAsync(
+      { sub: id, email, role, authStrategy },
+      {
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+        expiresIn: this.configService.get<string>(
+          'JWT_REFRESH_TOKEN_EXPIRATION',
+        ),
+      },
+    );
+
+    // Wait for both promises to resolve
+    const [accessToken, refreshToken] = await Promise.all([
+      accessTokenPromise,
+      refreshTokenPromise,
+    ]);
+
+    return { accessToken, refreshToken };
   }
 }
