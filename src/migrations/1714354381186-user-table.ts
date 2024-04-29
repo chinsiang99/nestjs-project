@@ -3,6 +3,10 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class UserTable1714354381186 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
+                DROP TABLE IF EXISTS \`user\`
+            `);
+
+    await queryRunner.query(`
                 CREATE TABLE \`user\` (
                     \`id\` INT AUTO_INCREMENT PRIMARY KEY,
                     \`email\` VARCHAR(255) UNIQUE NOT NULL,
