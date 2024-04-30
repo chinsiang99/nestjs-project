@@ -5,9 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from './passport-strategy/access-token.strategy';
+import { EntityManager } from 'typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), JwtModule.register({})],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    JwtModule.register({}),
+    EntityManager,
+  ],
   controllers: [AuthController],
   providers: [AuthService, AccessTokenStrategy],
 })

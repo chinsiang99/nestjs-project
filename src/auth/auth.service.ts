@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -16,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IJwtToken } from '../utils/interfaces/jwt-token.interface';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { IUserPayload } from 'src/utils/interfaces/user-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -98,15 +100,26 @@ export class AuthService {
    * @returns {Promise<IJwtToken>} A promise that resolves with the new JWT tokens upon successful verification of the refresh token.
    * @throws {UnauthorizedException} Thrown if the refresh token is invalid or expired.
    */
-  async getRefreshToken(refreshtokenDto: RefreshTokenDto): Promise<IJwtToken> {
+  async getRefreshToken(
+    refreshtokenDto: RefreshTokenDto,
+    user: IUserPayload,
+  ): Promise<IJwtToken> {
     const { refreshToken } = refreshtokenDto;
     try {
-      const { id } = await this.jwtService.verifyAsync(refreshToken, {
+      const { sub } = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
       });
-      const user = await this.userRepository.findOne({ where: { id } });
-      return await this.generateToken(user);
+      if (sub !== user.sub) {
+        throw new ForbiddenException(
+          `You are not the owner of the refresh token`,
+        );
+      }
+      const userDetails = await this.userRepository.findOne({
+        where: { id: sub },
+      });
+      return await this.generateToken(userDetails);
     } catch (error) {
+      console.log(error);
       throw new UnauthorizedException('Invalid credentials');
     }
   }

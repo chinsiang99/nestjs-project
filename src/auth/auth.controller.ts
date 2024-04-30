@@ -27,6 +27,11 @@ import {
 } from 'src/utils/response-interface/login-response.interface';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AccessTokenGuard } from 'src/utils/guards/access-token.guard';
+import { Roles } from './decorators/role';
+import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
+import { RoleGuard } from 'src/utils/guards/authorization.guard';
+import { User } from 'src/utils/decorators/user-decorator';
+import { IUserPayload } from 'src/utils/interfaces/user-payload.interface';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -62,7 +67,8 @@ export class AuthController {
     };
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.USER)
   @Get('refresh-token')
   @ApiOperation({ summary: 'Get refresh token' })
   @ApiOkResponse({
@@ -72,8 +78,9 @@ export class AuthController {
   @ApiBadRequestResponse({ description: 'Bad request error' })
   async getRefreshToken(
     @Body() refreshTokenDto: RefreshTokenDto,
+    @User() user: IUserPayload,
   ): Promise<ILoginResponse> {
-    const token = await this.authService.getRefreshToken(refreshTokenDto);
+    const token = await this.authService.getRefreshToken(refreshTokenDto, user);
     return {
       status: HttpStatus.OK,
       message: 'Successfully refresh token',
