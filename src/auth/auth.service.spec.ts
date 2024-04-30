@@ -13,6 +13,7 @@ import { BadRequestException, InternalServerErrorException, NotFoundException, U
 import * as bcrypt from 'bcryptjs'; // Import bcryptjs as default
 import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
 import { AuthStrategyEnum } from 'src/utils/enums/auth-strategy.enum';
+import { IUserPayload } from 'src/utils/interfaces/user-payload.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -38,6 +39,15 @@ describe('AuthService', () => {
 
   const dummyRefreshTokenDto: RefreshTokenDto = {
     refreshToken: 'dummy refresh token'
+  }
+
+  const dummyUserPayload: IUserPayload = {
+    sub: 1,
+    email: 'chinsiang9@gmail.com',
+    role: UserRoleEnum.USER,
+    authStrategy: AuthStrategyEnum.SYSTEM,
+    iat: 1,
+    exp: 1,
   }
 
   beforeEach(async () => {
@@ -160,17 +170,17 @@ describe('AuthService', () => {
 
   describe('function getRefreshToken', () => {
     it("should successfully resolve", async()=>{
-      jwtService.verifyAsync = jest.fn().mockResolvedValueOnce({id: 1})
+      jwtService.verifyAsync = jest.fn().mockResolvedValueOnce({sub: 1})
       service.generateToken = jest.fn().mockResolvedValueOnce(dummyJwtToken)
       userRepository.findOne = jest.fn().mockResolvedValueOnce({id: 1})
-      const result = await service.getRefreshToken(dummyRefreshTokenDto)
+      const result = await service.getRefreshToken(dummyRefreshTokenDto, dummyUserPayload)
       expect(result).toMatchObject(dummyJwtToken)
     })
 
     it("should throw unauthorized exception if there is any error occur in getting refresh token", async()=>{
       jwtService.verifyAsync = jest.fn().mockResolvedValueOnce(Error('any other error'))
       try{
-        await service.getRefreshToken(dummyRefreshTokenDto)
+        await service.getRefreshToken(dummyRefreshTokenDto, dummyUserPayload)
       }catch(error){
         expect(error).toBeInstanceOf(UnauthorizedException)
         expect(error.message).toStrictEqual('Invalid credentials')
