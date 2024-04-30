@@ -11,6 +11,7 @@ import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
     }),
     LoggerModule,
     DatabaseModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -30,6 +32,7 @@ export class AppModule implements NestModule, OnModuleInit {
   async onModuleInit(): Promise<void> {
     if (process.env.MIGRATION === 'true') {
       try {
+        console.log('should be here man');
         const migrations = await this.dataSource.runMigrations();
         console.log('Database migrated successfully.');
         console.log('Successfully migrate length: ', migrations.length);
