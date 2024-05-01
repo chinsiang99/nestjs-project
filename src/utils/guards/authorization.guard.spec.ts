@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { EntityManager } from 'typeorm';
 // import { RoleGuard } from './role.guard';
 import { UserRoleEnum } from '../enums/user-role.enum';
-import { User } from 'src/auth/entities/auth.entity';
+import { User } from '../../auth/entities/auth.entity';
 import { RoleGuard } from './authorization.guard';
 
 describe('RoleGuard', () => {

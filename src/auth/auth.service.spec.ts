@@ -6,14 +6,14 @@ import { Repository } from 'typeorm';
 import { User } from './entities/auth.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RegisterDto } from './dto/create-auth.dto';
-import { IJwtToken } from 'src/utils/interfaces/jwt-token.interface';
+import { IJwtToken } from '../utils/interfaces/jwt-token.interface';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { BadRequestException, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs'; // Import bcryptjs as default
-import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
-import { AuthStrategyEnum } from 'src/utils/enums/auth-strategy.enum';
-import { IUserPayload } from 'src/utils/interfaces/user-payload.interface';
+import { UserRoleEnum } from '../utils/enums/user-role.enum';
+import { AuthStrategyEnum } from '../utils/enums/auth-strategy.enum';
+import { IUserPayload } from '../utils/interfaces/user-payload.interface';
 
 describe('AuthService', () => {
   let service: AuthService;

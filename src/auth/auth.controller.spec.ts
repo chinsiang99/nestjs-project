@@ -3,13 +3,13 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/create-auth.dto';
 import { HttpStatus } from '@nestjs/common';
-import { IJwtToken } from 'src/utils/interfaces/jwt-token.interface';
+import { IJwtToken } from '../utils/interfaces/jwt-token.interface';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { EntityManager } from 'typeorm';
-import { IUserPayload } from 'src/utils/interfaces/user-payload.interface';
-import { AuthStrategyEnum } from 'src/utils/enums/auth-strategy.enum';
-import { UserRoleEnum } from 'src/utils/enums/user-role.enum';
+import { IUserPayload } from '../utils/interfaces/user-payload.interface';
+import { AuthStrategyEnum } from '../utils/enums/auth-strategy.enum';
+import { UserRoleEnum } from '../utils/enums/user-role.enum';
 
 describe('AuthController', () => {
   let controller: AuthController;
