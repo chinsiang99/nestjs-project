@@ -88,7 +88,7 @@ describe('AuthController', () => {
     })
   })
 
-  describe('GET auth/refresh-token', ()=>{
+  describe('POST auth/refresh-token', ()=>{
     it("should successfully resolve", async()=>{
       const result = await controller.getRefreshToken(dummyRefreshTokenDto, dummyUserPayload)
       expect(result.status).toStrictEqual(HttpStatus.OK)
