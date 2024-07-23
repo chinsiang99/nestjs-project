@@ -4,7 +4,7 @@ import { hashSync } from 'bcryptjs';
 export class AddUserAdmin1714374920713 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Insert admin user
-    const password = 'password';
+    const password = 'Hellothere101!';
     const hashedPassword = hashSync(password, 10);
     await queryRunner.query(`
               INSERT IGNORE INTO \`user\` (\`email\`, \`password\`, \`auth_strategy\`, \`role\`)
