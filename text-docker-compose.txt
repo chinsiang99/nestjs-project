@@ -1,0 +1,5 @@
+docker compose build => building the app
+docker compose up -d => running the app
+docker compose ps => list the containers
+docker compose logs -f backend => Look at the backend container logs
+docker compose down => stopping the app

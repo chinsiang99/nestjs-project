@@ -4,13 +4,13 @@ import {
   Body,
   HttpStatus,
   HttpCode,
-  Get,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/create-auth.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -55,7 +55,7 @@ export class AuthController {
   @ApiOperation({ summary: 'User log in an account' })
   @ApiOkResponse({
     type: LoginResponse,
-    description: 'User successfully long in an account',
+    description: 'User successfully log in an account',
   })
   @ApiBadRequestResponse({ description: 'Bad request error' })
   async login(@Body() loginDto: LoginDto): Promise<ILoginResponse> {
@@ -67,9 +67,10 @@ export class AuthController {
     };
   }
 
+  @ApiBearerAuth()
   @UseGuards(AccessTokenGuard, RoleGuard)
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.USER)
-  @Get('refresh-token')
+  @Post('refresh-token')
   @ApiOperation({ summary: 'Get refresh token' })
   @ApiOkResponse({
     type: LoginResponse,
